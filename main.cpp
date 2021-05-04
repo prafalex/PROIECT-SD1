@@ -7,10 +7,11 @@ ofstream out("date.out");
 struct nod_arbore
 {
     int info;
+    int nr_ap=1;
     nod_arbore* fiu_stang;
     nod_arbore* fiu_drept;
 };
-
+//functie creare un nou nod
 struct arbore
 {
     int nrElemente;
@@ -20,6 +21,7 @@ struct arbore
         radacina=NULL;
         nrElemente=0;
     }
+
     void insert_element(int x)
     {
         nrElemente++;
@@ -34,12 +36,17 @@ struct arbore
             return;
         }
 
+
         nod_arbore* pointer_prev = NULL;
         nod_arbore* pointer = radacina;
         int directie = 0;
 
         while(pointer!=NULL)
         {
+            if(pointer->info==x){
+                pointer->nr_ap++;
+                return;
+            }
             pointer_prev=pointer;
             if (x<=pointer->info)
             {
@@ -59,101 +66,8 @@ struct arbore
             pointer_prev->fiu_drept=nou;
     }
 
-    void delete_element(int x)
-    {
-        nod_arbore* pointer_prev =NULL;
-        nod_arbore* pointer =radacina;
-        int directie=0;
-        while (pointer!=NULL && pointer->info!=x)
-        {
-            pointer_prev=pointer;
-            if (x<= pointer->info)
-            {
-                pointer=pointer->fiu_stang;
-                directie= -1;
-            }
-            else
-            {
-                pointer= pointer->fiu_drept;
-                directie =1;
-            }
-        }
 
-        if (pointer==NULL)
-        {
-            out<<"nu exista "<<x<<endl;
-            return;
-        }
-        nrElemente--;
-        //pointer indica nodul care trebuie sters
-        //cazul in care nodul de sters nu are fii
-        if (pointer->fiu_stang==NULL && pointer->fiu_drept==NULL)
-        {
-            out<<"nu are fii "<<x<<endl;
-            if (pointer == radacina)
-            {
-                out<<"este radacina "<<x<<endl;
-                radacina=NULL;
-                delete pointer;
-                return;
-            }
-            if (directie<0)
-                pointer_prev->fiu_stang=NULL;
-            else
-                pointer_prev->fiu_drept=NULL;
-            delete pointer;
-            return;
-        }
-        //cazul in care nodul de sters are doar fiu stang
-        if (pointer->fiu_stang!=NULL && pointer->fiu_drept==NULL)
-        {
-            out<<"are doar fiu stang "<<x<<endl;
-            if (pointer == radacina)
-            {
-                out<<"este radacina "<<x<<endl;
-                radacina=pointer->fiu_stang;
-                delete pointer;
-                return;
-            }
-            if (directie<0)
-                pointer_prev->fiu_stang=pointer->fiu_stang;
-            else
-                pointer_prev->fiu_drept=pointer->fiu_stang;
-            delete pointer;
-            return;
-        }
-        //cazul in care nodul de sters are doar fiu drept
-        if (pointer->fiu_stang==NULL && pointer->fiu_drept!=NULL)
-        {
-            out<<"are doar fiu stang "<<x<<endl;
-            if (pointer == radacina)
-            {
-                out<<"este radacina "<<x<<endl;
-                radacina=pointer->fiu_drept;
-                delete pointer;
-                return;
-            }
-            if (directie<0)
-                pointer_prev->fiu_stang=pointer->fiu_drept;
-            else
-                pointer_prev->fiu_drept=pointer->fiu_drept;
-            delete pointer;
-            return;
-        }
-        //cazul in care nodul de sters are ambii fii
-        out<<"are ambii fii "<<x<<endl;
-        nod_arbore* pointer2=pointer->fiu_stang;
-        while (pointer2->fiu_drept!=NULL)
-            pointer2=pointer2->fiu_drept;
 
-        int valoare = pointer2->info;
-        out<<"nodul "<<valoare<<" il poate inlocui pe "<<x<<endl;
-        delete_element(valoare);//doar daca sunt toate cheile distincte
-        //am garantia ca valoare va fi sters ori cu stergerea-fara-fii
-        //ori cu stergerea doar-fiu-stang; sigur nu are fiu drept
-
-        pointer->info=valoare;
-    }
 
     void SRD()
     {
@@ -166,7 +80,7 @@ struct arbore
         if (pointer!=NULL)
         {
             SRD(pointer->fiu_stang);
-            out<<pointer->info<<" ";
+            out<<pointer->info<<"("<<pointer->nr_ap<<")"<<" ";
             SRD(pointer->fiu_drept);
         }
     }
@@ -180,7 +94,7 @@ struct arbore
     {
         if (pointer!=NULL)
         {
-            out<<pointer->info<<" ";
+            out<<pointer->info<<"("<<pointer->nr_ap<<")"<<" ";
             RSD(pointer->fiu_stang);
             RSD(pointer->fiu_drept);
         }
@@ -189,14 +103,14 @@ struct arbore
 
     int minim()
     {
-        nod_arbore* pointer =radacina;
+        nod_arbore * pointer =radacina;
         while(pointer->fiu_stang!=NULL)
             pointer=pointer->fiu_stang;
         return pointer->info;
     }
     int maxim()
     {
-        nod_arbore* pointer =radacina;
+        nod_arbore * pointer =radacina;
         while(pointer->fiu_drept!=NULL)
             pointer=pointer->fiu_drept;
         return pointer->info;
@@ -344,7 +258,8 @@ struct arbore
     {
         if (n == NULL)
             return;
-        if(k>nrElemente)
+        int c=cardinal2(radacina);
+        if(k>c)
         {
             out<<"Elementul de pe pozitia "<<k<<" nu exista.\n";
             return;
@@ -368,6 +283,58 @@ struct arbore
         int ct=0;
         return k_element(n,k,ct);
     }
+
+    nod_arbore *minN(nod_arbore *n)
+    {
+        nod_arbore * act=n;
+        while(act && act->fiu_stang!=NULL)
+            act=act->fiu_stang;
+
+        return act;
+    }
+
+    nod_arbore* sterge(nod_arbore * rad,int x)
+    {
+        if(rad==NULL)
+            return rad;
+
+        //gasire nod
+
+        if(x<rad->info)
+            rad->fiu_stang=sterge(rad->fiu_stang,x);
+        else if(x>rad->info)
+            rad->fiu_drept=sterge(rad->fiu_drept,x);
+        else
+        {
+            //daca nr de ap este>1 stergem din nr de ap
+            if(rad->nr_ap>1)
+            {
+                (rad->nr_ap)--;
+                return rad;
+            }
+            //daca nu stergem nodul
+            // nod cu un fiu sau fara fii
+            if(rad->fiu_stang==NULL)
+            {
+                nod_arbore * tmp= rad->fiu_drept;
+                free(rad);
+                return tmp;
+            }
+            else if(rad->fiu_drept=NULL)
+            {
+                nod_arbore * tmp= rad->fiu_stang;
+                free(rad);
+                return tmp;
+            }
+
+            //daca avem 2 copii
+            nod_arbore *tmp=minN(rad->fiu_drept);
+            // succesorul inorder in pozitia nodului ce urmeaza sa fie sters
+            rad->info=tmp->info;
+            //stergem succesorul inorder
+            rad->fiu_drept= sterge(rad->fiu_drept,tmp->info);
+        }
+    }
 };
 
 int main()
@@ -378,6 +345,7 @@ int main()
         out<<"eroare deschidere fisier";
     }
     int a;
+    //arb.insert_element(1);
     while(in>>a)
     {
         arb.insert_element(a);
@@ -386,7 +354,8 @@ int main()
     arb.SRD();
     arb.RSD();
 
-    //arb.delete_element(6);
+    arb.sterge(arb.radacina,7);
+    //arb.sterge(arb.radacina,10);
 
     arb.SRD();
     arb.RSD();
@@ -412,6 +381,7 @@ int main()
     /*for(int i=1;i<=20;i++)
         out<<"Apare "<<i<<" in arbore: "<<arb.este_in(i)<<endl;*/
     int cnt=0;
+
     arb.k_element(arb.radacina,2);
     arb.k_element(arb.radacina,4);
     arb.k_element(arb.radacina,14);
