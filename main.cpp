@@ -326,14 +326,13 @@ struct arbore
         return nrElemente;
     }
 
-    void k_element(nod_arbore* n, int k)
+    void k_element(nod_arbore* n, int k,int &ct )
     {
-        static int ct = 0;
         if (n == NULL)
             return;
         if (ct <= k)
         {
-            k_element(n->fiu_stang, k);
+            k_element(n->fiu_stang, k,ct);
 
             ct++;
             if (ct == k)
@@ -341,9 +340,7 @@ struct arbore
                 cout << n->info << " ";
                 return;
             }
-
-
-            k_element(n->fiu_drept, k);
+            k_element(n->fiu_drept, k,ct);
         }
 
     }
@@ -392,9 +389,11 @@ int main()
     cout<<"\n-----------------\n";
     /*for(int i=1;i<=20;i++)
         cout<<"Apare "<<i<<" in arbore: "<<arb.este_in(i)<<endl;*/
-    nod_arbore *rad=arb.radacina;
+    int cnt=0;
+    arb.k_element(arb.radacina,2,cnt);
+    cnt=0;
+    arb.k_element(arb.radacina,5,cnt);
 
-    arb.k_element(arb.radacina,12);
 
 
     return 0;
