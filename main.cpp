@@ -1,6 +1,9 @@
 #include <iostream>
+#include <fstream>
 using namespace std;
 
+ifstream in("date.in");
+ofstream out("date.out");
 struct nod_arbore
 {
     int info;
@@ -78,7 +81,7 @@ struct arbore
 
         if (pointer==NULL)
         {
-            cout<<"nu exista "<<x<<endl;
+            out<<"nu exista "<<x<<endl;
             return;
         }
         nrElemente--;
@@ -86,10 +89,10 @@ struct arbore
         //cazul in care nodul de sters nu are fii
         if (pointer->fiu_stang==NULL && pointer->fiu_drept==NULL)
         {
-            cout<<"nu are fii "<<x<<endl;
+            out<<"nu are fii "<<x<<endl;
             if (pointer == radacina)
             {
-                cout<<"este radacina "<<x<<endl;
+                out<<"este radacina "<<x<<endl;
                 radacina=NULL;
                 delete pointer;
                 return;
@@ -104,10 +107,10 @@ struct arbore
         //cazul in care nodul de sters are doar fiu stang
         if (pointer->fiu_stang!=NULL && pointer->fiu_drept==NULL)
         {
-            cout<<"are doar fiu stang "<<x<<endl;
+            out<<"are doar fiu stang "<<x<<endl;
             if (pointer == radacina)
             {
-                cout<<"este radacina "<<x<<endl;
+                out<<"este radacina "<<x<<endl;
                 radacina=pointer->fiu_stang;
                 delete pointer;
                 return;
@@ -122,10 +125,10 @@ struct arbore
         //cazul in care nodul de sters are doar fiu drept
         if (pointer->fiu_stang==NULL && pointer->fiu_drept!=NULL)
         {
-            cout<<"are doar fiu stang "<<x<<endl;
+            out<<"are doar fiu stang "<<x<<endl;
             if (pointer == radacina)
             {
-                cout<<"este radacina "<<x<<endl;
+                out<<"este radacina "<<x<<endl;
                 radacina=pointer->fiu_drept;
                 delete pointer;
                 return;
@@ -138,13 +141,13 @@ struct arbore
             return;
         }
         //cazul in care nodul de sters are ambii fii
-        cout<<"are ambii fii "<<x<<endl;
+        out<<"are ambii fii "<<x<<endl;
         nod_arbore* pointer2=pointer->fiu_stang;
         while (pointer2->fiu_drept!=NULL)
             pointer2=pointer2->fiu_drept;
 
         int valoare = pointer2->info;
-        cout<<"nodul "<<valoare<<" il poate inlocui pe "<<x<<endl;
+        out<<"nodul "<<valoare<<" il poate inlocui pe "<<x<<endl;
         delete_element(valoare);//doar daca sunt toate cheile distincte
         //am garantia ca valoare va fi sters ori cu stergerea-fara-fii
         //ori cu stergerea doar-fiu-stang; sigur nu are fiu drept
@@ -154,30 +157,30 @@ struct arbore
 
     void SRD()
     {
-        cout<<"SRD: ";
+        out<<"SRD: ";
         SRD(radacina);
-        cout<<endl;
+        out<<endl;
     }
     void SRD(nod_arbore* pointer)
     {
         if (pointer!=NULL)
         {
             SRD(pointer->fiu_stang);
-            cout<<pointer->info<<" ";
+            out<<pointer->info<<" ";
             SRD(pointer->fiu_drept);
         }
     }
     void RSD()
     {
-        cout<<"RSD: ";
+        out<<"RSD: ";
         RSD(radacina);
-        cout<<endl;
+        out<<endl;
     }
     void RSD(nod_arbore* pointer)
     {
         if (pointer!=NULL)
         {
-            cout<<pointer->info<<" ";
+            out<<pointer->info<<" ";
             RSD(pointer->fiu_stang);
             RSD(pointer->fiu_drept);
         }
@@ -222,7 +225,7 @@ struct arbore
 
         if (pointer==NULL)
         {
-            cout<<"nu exista "<<x<<endl;
+            out<<"nu exista "<<x<<endl;
             return -1;
         }
         //pointer are nodul
@@ -233,7 +236,7 @@ struct arbore
 
             else
             {
-                cout<<"nu exista";
+                out<<"nu exista";
                 return -1;
             }
         else
@@ -271,7 +274,7 @@ struct arbore
 
         if (pointer==NULL)
         {
-            cout<<"nu exista "<<x<<endl;
+            out<<"nu exista "<<x<<endl;
             return -1;
         }
         //pointer are nodul
@@ -284,7 +287,7 @@ struct arbore
 
             else
             {
-                cout<<"nu exista";
+                out<<"nu exista";
                 return -1;
             }
         else
@@ -325,11 +328,27 @@ struct arbore
     {
         return nrElemente;
     }
-
+    int cardinal2(nod_arbore *n)
+    {
+        int ct=1;
+        if(n==NULL)
+            return 0;
+        else
+        {
+            ct+=cardinal2(n->fiu_stang);
+            ct+=cardinal2(n->fiu_drept);
+            return ct;
+        }
+    }
     void k_element(nod_arbore* n, int k,int &ct )
     {
         if (n == NULL)
             return;
+        if(k>nrElemente)
+        {
+            out<<"Elementul de pe pozitia "<<k<<" nu exista.\n";
+            return;
+        }
         if (ct <= k)
         {
             k_element(n->fiu_stang, k,ct);
@@ -337,30 +356,32 @@ struct arbore
             ct++;
             if (ct == k)
             {
-                cout << n->info << " ";
+                out <<"Elementul cautat : "<< n->info<<".\n";
                 return;
             }
             k_element(n->fiu_drept, k,ct);
         }
 
     }
+    void k_element(nod_arbore* n, int k)
+    {
+        int ct=0;
+        return k_element(n,k,ct);
+    }
 };
 
 int main()
 {
     arbore arb;
-    arb.insert_element(6);
-    arb.insert_element(4);
-    arb.insert_element(9);
-    arb.insert_element(2);
-    arb.insert_element(1);
-    arb.insert_element(5);
-    arb.insert_element(3);
-    arb.insert_element(7);
-    arb.insert_element(8);
-    arb.insert_element(75);
-    arb.insert_element(123);
-    arb.insert_element(98);
+    if(!in)
+    {
+        out<<"eroare deschidere fisier";
+    }
+    int a;
+    while(in>>a)
+    {
+        arb.insert_element(a);
+    }
 
     arb.SRD();
     arb.RSD();
@@ -369,32 +390,31 @@ int main()
 
     arb.SRD();
     arb.RSD();
-    cout<<"\n-----------------\n";
-    cout<<"min:"<<arb.minim();
-    cout<<endl;
-    cout<<"max:"<<arb.maxim();
-    cout<<"\n-----------------\n";
+    out<<"\n-----------------\n";
+    out<<"min:"<<arb.minim();
+    out<<endl;
+    out<<"max:"<<arb.maxim();
+    out<<"\n-----------------\n";
     int n=5;
-    cout<<"Succesorul lui "<<n<<": "<<arb.succesor(n)<<endl;
+    out<<"Succesorul lui "<<n<<": "<<arb.succesor(n)<<endl;
     /*for(int i=1;i<=9;i++)
-        cout<<"Succesorul lui "<<i<<": "<<arb.succesor(i)<<endl;*/
-    cout<<"Predecesorul lui "<<n<<": "<<arb.predecesor(n)<<endl;
+        out<<"Succesorul lui "<<i<<": "<<arb.succesor(i)<<endl;*/
+    out<<"Predecesorul lui "<<n<<": "<<arb.predecesor(n)<<endl;
     /*for(int i=1;i<=9;i++)
-        cout<<"Predecesorul lui "<<i<<": "<<arb.predecesor(i)<<endl;*/
-    cout<<"\n-----------------\n";
+        out<<"Predecesorul lui "<<i<<": "<<arb.predecesor(i)<<endl;*/
+
+    out<<"\n-----------------\n";
 
 
-    cout<<"\n-----------------\n";
-    cout<<"Cardinal: "<<arb.cardinal();
-    cout<<"\n-----------------\n";
+    out<<"\n-----------------\n";
+    out<<"Cardinal: "<<arb.cardinal();
+    out<<"\n-----------------\n";
     /*for(int i=1;i<=20;i++)
-        cout<<"Apare "<<i<<" in arbore: "<<arb.este_in(i)<<endl;*/
+        out<<"Apare "<<i<<" in arbore: "<<arb.este_in(i)<<endl;*/
     int cnt=0;
-    arb.k_element(arb.radacina,2,cnt);
-    cnt=0;
-    arb.k_element(arb.radacina,5,cnt);
-
-
+    arb.k_element(arb.radacina,2);
+    arb.k_element(arb.radacina,4);
+    arb.k_element(arb.radacina,14);
 
     return 0;
 }

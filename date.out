@@ -1,0 +1,20 @@
+SRD: 1 2 3 4 5 6 7 8 9 75 123 
+RSD: 6 4 2 1 3 5 9 7 8 75 123 
+SRD: 1 2 3 4 5 6 7 8 9 75 123 
+RSD: 6 4 2 1 3 5 9 7 8 75 123 
+
+-----------------
+min:1
+max:123
+-----------------
+Succesorul lui 5: 6
+Predecesorul lui 5: 4
+
+-----------------
+
+-----------------
+Cardinal: 11
+-----------------
+Elementul cautat : 2.
+Elementul cautat : 4.
+Elementul de pe pozitia 14 nu exista.
